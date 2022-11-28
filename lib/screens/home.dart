@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../constants/colors.dart';
-import '../widgets/todo_item.dart';
+import '../widgets/todoItem.dart';
 import '../model/todo.dart';
 
 class Home extends StatefulWidget {
@@ -11,8 +11,8 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-    final todoList1 = Todo.todoList();
-    final _todoController = TextEditingController();
+    final todolist = Todo.todoList();
+    final todoController = TextEditingController();
     int currentPageIndex = 0;
 
     @override
@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
                     GestureDetector(
                         onTap: () {
                             setState(() {
-                            currentPageIndex = 1;
+                                currentPageIndex = 1;
                             });
                         },
                         child: Container(
@@ -90,7 +90,7 @@ class _HomeState extends State<Home> {
                     GestureDetector(
                         onTap: () {
                             setState(() {
-                            currentPageIndex = 2;
+                                currentPageIndex = 2;
                             });
                         },
                         child: Container(
@@ -113,12 +113,12 @@ class _HomeState extends State<Home> {
                         margin: EdgeInsets.only(top: 20, bottom: 20, left: 10),
                         child: Text('Done List:', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500))
                     ),
-                    for (Todo todo in todoList1) 
+                    for (Todo todo in todolist) 
                         if (todo.done) 
                             TodoItem(
                                 todo: todo,
-                                onTodoChanged: _handleChange,
-                                onDeleteItem: _handleDelete,
+                                onDone: handleChange,
+                                onDelete: handleDelete,
                             ),    
                 ]
             )
@@ -135,12 +135,12 @@ class _HomeState extends State<Home> {
                                     margin: EdgeInsets.only(top: 20, bottom: 20, left: 10),
                                     child: Text('Todo List:', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500))
                                 ),
-                                for (Todo todo in todoList1) 
+                                for (Todo todo in todolist) 
                                     if (!todo.done)
                                     TodoItem(
                                         todo: todo,
-                                        onTodoChanged: _handleChange,
-                                        onDeleteItem: _handleDelete,
+                                        onDone: handleChange,
+                                        onDelete: handleDelete,
                                     ),
                             ]
                         )
@@ -153,7 +153,7 @@ class _HomeState extends State<Home> {
                                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                                 child: TextField(
-                                    controller: _todoController,
+                                    controller: todoController,
                                     decoration: InputDecoration(
                                         hintText: 'Add your item',
                                         border: InputBorder.none,
@@ -165,7 +165,7 @@ class _HomeState extends State<Home> {
                                 child: ElevatedButton(
                                     child: Text('+', style: TextStyle(fontSize: 40,)),
                                     onPressed: () {
-                                        _handleAdd(_todoController.text);
+                                        handleAdd(todoController.text);
                                     },
                                 ),
                             )
@@ -175,23 +175,23 @@ class _HomeState extends State<Home> {
             );
     }
 
-    void _handleChange(Todo todo) {
+    void handleChange(Todo todo) {
         setState(() {
             todo.done = !todo.done;
         });
     }
 
-    void _handleDelete(int id) {
+    void handleDelete(int id) {
         setState(() {
-            todoList1.removeWhere((item) => item.id == id);
+            todolist.removeWhere((item) => item.id == id);
         });
     }
 
-    void _handleAdd(String todo) {
+    void handleAdd(String todo) {
         setState(() {
-            todoList1.add(Todo(id: todoList1.last.id + 1, text: todo));
+            todolist.add(Todo(id: todolist.last.id + 1, text: todo));
         });
-        _todoController.clear(); //Clear text field
+        todoController.clear(); //Clear text field
     }
 
 }
