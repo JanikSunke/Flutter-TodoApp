@@ -11,19 +11,122 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-    final todoList = Todo.todoList();
+    final todoList1 = Todo.todoList();
     final _todoController = TextEditingController();
+    int currentPageIndex = 0;
 
     @override
     Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: transparent,
         appBar: AppBar(
-            backgroundColor: transparent,
+            backgroundColor: darkBlue,
             title: Text(
                 'Todo App',
-                style: TextStyle(color: blue))),
-        body: Stack(
+                style: TextStyle(color: Colors.white))),
+            bottomNavigationBar: NavigationBar(
+                onDestinationSelected: (int index) {
+                    setState(() {
+                        currentPageIndex = index;
+                    });
+                },
+                selectedIndex: currentPageIndex,
+                destinations: const <Widget>[
+                    NavigationDestination(
+                        selectedIcon: Icon(Icons.home),
+                        icon: Icon(Icons.home_outlined),
+                        label: 'Home',
+                    ),
+                    NavigationDestination(
+                        selectedIcon: Icon(Icons.check_circle),
+                        icon: Icon(Icons.check_circle_outlined),
+                        label: 'Todo',
+                    ),
+                    NavigationDestination(
+                        selectedIcon: Icon(Icons.playlist_add_check_circle),
+                        icon: Icon(Icons.playlist_add_check_circle_outlined),
+                        label: 'Done',
+                    ),
+                ],
+        ),
+        body: <Widget>[
+                Container(
+                alignment: Alignment.center,
+                child: welcome(),
+                ),
+                Container(
+                alignment: Alignment.center,
+                child: list(),
+                ),
+                Container(
+                alignment: Alignment.center,
+                child: doneList(),
+                ),
+            ][currentPageIndex],
+        );
+    }
+
+    Widget welcome() {
+        return Container(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                    Icon(Icons.check_circle, size: 150, color: blue),
+                    Text('Welcome', style: TextStyle(fontSize: 72, fontWeight: FontWeight.w700)),
+                    Text('Go check out the todo app:', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                    GestureDetector(
+                        onTap: () {
+                            setState(() {
+                            currentPageIndex = 1;
+                            });
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(color: blue, borderRadius: BorderRadius.circular(5)),
+                            margin: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(8),
+                            child: Text("Go to your Todo"),
+                        ),
+                    ),
+                    GestureDetector(
+                        onTap: () {
+                            setState(() {
+                            currentPageIndex = 2;
+                            });
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(color: blue, borderRadius: BorderRadius.circular(5)),
+                            margin: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(8),
+                            child: Text("Go to your finished Todo"),
+                        ),
+                    ),
+                ],
+            ),
+        );
+    }
+
+    Widget doneList() {
+        return Container(
+            child: ListView(
+                children: [
+                    Container(
+                        margin: EdgeInsets.only(top: 20, bottom: 20, left: 10),
+                        child: Text('Done List:', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500))
+                    ),
+                    for (Todo todo in todoList1) 
+                        if (todo.done) 
+                            TodoItem(
+                                todo: todo,
+                                onTodoChanged: _handleChange,
+                                onDeleteItem: _handleDelete,
+                            ),    
+                ]
+            )
+        );
+    }
+
+    Widget list() {
+        return Stack(
                 children: [
                     Container(
                         child: ListView(
@@ -32,11 +135,12 @@ class _HomeState extends State<Home> {
                                     margin: EdgeInsets.only(top: 20, bottom: 20, left: 10),
                                     child: Text('Todo List:', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500))
                                 ),
-                                for (Todo todo in todoList) 
+                                for (Todo todo in todoList1) 
+                                    if (!todo.done)
                                     TodoItem(
                                         todo: todo,
-                                        onTodoChanged: _handleToDoChange,
-                                        onDeleteItem: _deleteTodoItem,
+                                        onTodoChanged: _handleChange,
+                                        onDeleteItem: _handleDelete,
                                     ),
                             ]
                         )
@@ -61,32 +165,31 @@ class _HomeState extends State<Home> {
                                 child: ElevatedButton(
                                     child: Text('+', style: TextStyle(fontSize: 40,)),
                                     onPressed: () {
-                                        _addTodoElement(_todoController.text);
+                                        _handleAdd(_todoController.text);
                                     },
                                 ),
                             )
                         ])
                     )
                 ]
-            )
-        );
+            );
     }
 
-    void _handleToDoChange(Todo todo) {
+    void _handleChange(Todo todo) {
         setState(() {
             todo.done = !todo.done;
         });
     }
 
-    void _deleteTodoItem(int id) {
+    void _handleDelete(int id) {
         setState(() {
-            todoList.removeWhere((item) => item.id == id);
+            todoList1.removeWhere((item) => item.id == id);
         });
     }
 
-    void _addTodoElement(String todo) {
+    void _handleAdd(String todo) {
         setState(() {
-            todoList.add(Todo(id: todoList.last.id + 1, text: todo));
+            todoList1.add(Todo(id: todoList1.last.id + 1, text: todo));
         });
         _todoController.clear(); //Clear text field
     }
